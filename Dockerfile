@@ -14,8 +14,8 @@ COPY . .
 # Compila o projeto (ajuste se usar outra estrutura)
 RUN bun build src/index.ts --outdir ./dist --target bun
 
-# Expõe a porta da API
-EXPOSE 3333
+# Expõe a porta padrão (Coolify usa 3000 se não especificar outra)
+EXPOSE 3000
 
 # Inicia a aplicação
 CMD ["bun", "run", "dist/index.js"]
