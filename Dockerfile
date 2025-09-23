@@ -1,32 +1,24 @@
 # Use Bun official image
-FROM oven/bun:1.1.42-alpine AS base
+FROM oven/bun:1.1.42-alpine
 
 # Set working directory
 WORKDIR /app
 
-# Copy package.json and lock file
+# Create non-root user
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 bunjs
+
+# Copy package files
 COPY package.json bun.lock* ./
 
 # Install dependencies
-RUN bun install --frozen-lockfile --production
+RUN bun install --frozen-lockfile
 
 # Copy source code
-COPY . .
+COPY --chown=bunjs:nodejs . .
 
 # Build the application
 RUN bun run build
-
-# Create final stage
-FROM oven/bun:1.1.42-alpine AS runner
-
-WORKDIR /app
-
-# Create non-root user
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 bunjs
-
-# Copy built application
-COPY --from=base --chown=bunjs:nodejs /app .
 
 # Switch to non-root user
 USER bunjs
