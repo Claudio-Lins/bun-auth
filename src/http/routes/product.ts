@@ -93,6 +93,7 @@ export const productRoutes = new Elysia()
 
   return formattedProduct as unknown as ProductOutputType
 }, {
+  requireRole: "MANAGER",
   detail: {
     summary: "Create a product",
     tags: ["Products"],
@@ -140,6 +141,7 @@ export const productRoutes = new Elysia()
 
       return formattedProduct as unknown as ProductOutputType
     }, {
+      requireRole: "MANAGER",
       detail: {
         summary: "Update a product",
         tags: ["Products"],
@@ -170,6 +172,7 @@ export const productRoutes = new Elysia()
         message: "Product deleted successfully",
       }
     }, {
+      requireRole: "MANAGER",
       detail: {
         summary: "Delete a product",
         tags: ["Products"],

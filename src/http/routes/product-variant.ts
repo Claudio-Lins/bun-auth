@@ -86,6 +86,7 @@ export const productVariantRoutes = new Elysia()
 
     return formattedVariant as unknown as VariantOutputType
   }, {
+    requireRole: "MANAGER",
     detail: {
       summary: "Create a product variant",
       tags: ["Products", "Variants"],
@@ -134,6 +135,7 @@ export const productVariantRoutes = new Elysia()
 
     return formattedVariant as unknown as VariantOutputType
   }, {
+    requireRole: "MANAGER",
     detail: {
       summary: "Update a product variant",
       tags: ["Products", "Variants"],
@@ -164,6 +166,7 @@ export const productVariantRoutes = new Elysia()
       message: "Product variant deleted successfully",
     }
   }, {
+    requireRole: "MANAGER",
     detail: {
       summary: "Delete a product variant",
       tags: ["Products", "Variants"],

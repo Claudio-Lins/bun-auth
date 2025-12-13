@@ -78,6 +78,7 @@ export const popcornUnitRoutes = new Elysia()
 
     return formattedUnit as unknown as PopcornUnitOutputType
   }, {
+    requireRole: "MANAGER",
     detail: {
       summary: "Create a popcorn unit",
       tags: ["Products", "Units"],
@@ -117,6 +118,7 @@ export const popcornUnitRoutes = new Elysia()
 
     return formattedUnit as unknown as PopcornUnitOutputType
   }, {
+    requireRole: "MANAGER",
     detail: {
       summary: "Update a popcorn unit",
       tags: ["Products", "Units"],
@@ -147,6 +149,7 @@ export const popcornUnitRoutes = new Elysia()
       message: "Popcorn unit deleted successfully",
     }
   }, {
+    requireRole: "MANAGER",
     detail: {
       summary: "Delete a popcorn unit",
       tags: ["Products", "Units"],

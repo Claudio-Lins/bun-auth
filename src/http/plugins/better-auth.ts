@@ -1,4 +1,7 @@
 import { auth } from "@/auth";
+import { db } from "@/database/client";
+import { users } from "@/database/schema/users";
+import { eq } from "drizzle-orm";
 import Elysia from "elysia";
 
 export const betterAuthPlugin = new Elysia({ name: "better-auth" })
@@ -12,7 +15,46 @@ export const betterAuthPlugin = new Elysia({ name: "better-auth" })
         }
         return session
       }
-    }
+    },
+    requireRole: (role: string) => ({
+      async resolve({ status, request: { headers } }) {
+        const session = await auth.api.getSession({ headers })
+        if (!session) {
+          return status(401, { message: "Unauthorized" })
+        }
+
+        // Buscar o usuário completo do banco para verificar a role
+        const user = await db.query.users.findFirst({
+          where: eq(users.id, session.user.id)
+        })
+
+        if (!user) {
+          return status(401, { message: "Unauthorized" })
+        }
+
+        // Verificar se o usuário tem a role necessária
+        const userRole = user.role || "user"
+        
+        // MANAGER permite manager e admin, ADMIN permite apenas admin
+        let allowedRoles: string[] = []
+        if (role === "MANAGER") {
+          allowedRoles = ["manager", "admin"]
+        } else if (role === "ADMIN") {
+          allowedRoles = ["admin"]
+        } else {
+          allowedRoles = [role.toLowerCase()]
+        }
+        
+        if (!allowedRoles.includes(userRole.toLowerCase())) {
+          return status(403, { 
+            message: "Forbidden", 
+            error: `This endpoint requires role: ${role}. Your role: ${userRole}` 
+          })
+        }
+
+        return { session, user }
+      }
+    })
   })
 
  

@@ -176,6 +176,7 @@ export const batchesRoutes = new Elysia()
 
     return formattedBatch as unknown as BatchOutputType
   }, {
+    requireRole: "MANAGER",
     detail: {
       summary: "Create a batch",
       tags: ["Products", "Batches"],
@@ -234,6 +235,7 @@ export const batchesRoutes = new Elysia()
       availableUnits: remainingAvailable,
     }
   }, {
+    requireRole: "MANAGER",
     detail: {
       summary: "Sell units from a batch",
       tags: ["Products", "Batches"],
@@ -269,6 +271,7 @@ export const batchesRoutes = new Elysia()
       message: "Batch deleted successfully",
     }
   }, {
+    requireRole: "MANAGER",
     detail: {
       summary: "Delete a batch",
       tags: ["Products", "Batches"],

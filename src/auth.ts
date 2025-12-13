@@ -1,16 +1,56 @@
 import { db } from '@/database/client';
+import { schema } from '@/database/schema';
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { openAPI } from 'better-auth/plugins';
+import { admin as adminPlugin } from 'better-auth/plugins';
+import { ac, admin, manager, user } from './auth/permissions';
 
 export const auth = betterAuth({
   basePath: '/api/auth',
   trustedOrigins: ["*"],
-  plugins: [openAPI()],
-    database: drizzleAdapter(db, {
-      provider: 'pg',
-      usePlural: true,
+  plugins: [
+    openAPI(),
+    adminPlugin({
+      ac,
+      roles: {
+        admin,
+        manager,
+        user,
+      },
+      defaultRole: "user",
     }),
+  ],
+  user: {
+    additionalFields: {
+      role: {
+        type: "string",
+        required: false,
+        defaultValue: "user",
+        input: false,
+      },
+    },
+  },
+  databaseHooks: {
+    user: {
+      create: {
+        before: async (userData) => {
+          // Garantir que o campo role seja sempre "user" na criação
+          return {
+            data: {
+              ...userData,
+              role: userData.role || "user",
+            },
+          };
+        },
+      },
+    },
+  },
+  database: drizzleAdapter(db, {
+    provider: 'pg',
+    usePlural: true,
+    schema,
+  }),
   advanced: {
     database: {
       generateId: false
