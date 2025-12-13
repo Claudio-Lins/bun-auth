@@ -1,21 +1,24 @@
-FROM oven/bun:latest AS base
+FROM oven/bun:latest AS build
 
 WORKDIR /app
 
 # Copia só arquivos de dependências primeiro (melhora cache no build)
-COPY package.json bun.lockb* ./
+COPY package.json .
+COPY bun.lockb* ./
 
 # Instala dependências (se não existir bun.lockb, ele ignora por causa do "*")
-RUN bun install --production
+RUN bun install
 
 # Copia o restante do projeto
-COPY . .
+COPY ./src ./src
+COPY ./build.ts ./build.ts
+COPY ./tsconfig.json ./tsconfig.json
+RUN bun build.ts
 
-# Compila o projeto (ajuste se usar outra estrutura)
-RUN bun build src/index.ts --outdir ./dist --target bun
-
-# Expõe a porta padrão (Coolify usa 3000 se não especificar outra)
-EXPOSE 3000
-
-# Inicia a aplicação
-CMD ["bun", "run", "dist/index.js"]
+# RUNTIME
+FROM gcr.io/distroless/base
+WORKDIR /app
+COPY --from=build /app/build/server server
+ENV NODE_ENV=production
+EXPOSE 3333
+CMD ["./server"]
