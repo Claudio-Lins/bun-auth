@@ -26,7 +26,7 @@ export const popcornUnitRoutes = new Elysia()
   }, {
     detail: {
       summary: "List all popcorn units",
-      tags: ["Popcorn Unit Route"],
+      tags: ["Products", "Units"],
     },
   })
   .get("/popcorn-units/:id", async function ({ params }: PopcornUnitParams): Promise<PopcornUnitOutputType> {
@@ -52,7 +52,7 @@ export const popcornUnitRoutes = new Elysia()
   }, {
     detail: {
       summary: "Get a popcorn unit by ID",
-      tags: ["Popcorn Unit Route"],
+      tags: ["Products", "Units"],
     },
     params: z.object({
       id: z.string(),
@@ -80,7 +80,7 @@ export const popcornUnitRoutes = new Elysia()
   }, {
     detail: {
       summary: "Create a popcorn unit",
-      tags: ["Popcorn Unit Route"],
+      tags: ["Products", "Units"],
     },
     body: CreatePopcornUnitInputSchema,
     response: {
@@ -119,7 +119,7 @@ export const popcornUnitRoutes = new Elysia()
   }, {
     detail: {
       summary: "Update a popcorn unit",
-      tags: ["Popcorn Unit Route"],
+      tags: ["Products", "Units"],
     },
     params: z.object({
       id: z.string(),
@@ -149,7 +149,7 @@ export const popcornUnitRoutes = new Elysia()
   }, {
     detail: {
       summary: "Delete a popcorn unit",
-      tags: ["Popcorn Unit Route"],
+      tags: ["Products", "Units"],
     },
     params: z.object({
       id: z.string(),

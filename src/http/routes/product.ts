@@ -14,13 +14,27 @@ type ProductParams = {
 
 export const productRoutes = new Elysia()
   .get("/products", async function () {
-    const allProducts = await db.query.products.findMany()
+    const allProducts = await db.query.products.findMany({
+      with: {
+        variants: true,
+      }
+    })
 
-    return allProducts
+    // Converter Date para string para corresponder ao schema
+    return allProducts.map((product) => ({
+      ...product,
+      createdAt: product.createdAt.toISOString(),
+      updatedAt: product.updatedAt.toISOString(),
+      variants: product.variants?.map((variant: any) => ({
+        ...variant,
+        createdAt: variant.createdAt?.toISOString() || new Date().toISOString(),
+        updatedAt: variant.updatedAt?.toISOString() || new Date().toISOString(),
+      })) || undefined,
+    }))
   }, {
     detail: {
       summary: "List all products",
-      tags: ["Product Route"],
+      tags: ["Products"],
     },
   })
   .get("/products/:id", async function ({ params }: ProductParams): Promise<ProductOutputType> {
@@ -53,7 +67,7 @@ export const productRoutes = new Elysia()
   }, {
     detail: {
       summary: "Get a product by ID",
-      tags: ["Product Route"],
+      tags: ["Products"],
     },
     params: z.object({
       id: z.string(),
@@ -81,7 +95,7 @@ export const productRoutes = new Elysia()
 }, {
   detail: {
     summary: "Create a product",
-    tags: ["Product Route"],
+    tags: ["Products"],
   },
   body: CreateProductInputSchema,
   response: {
@@ -128,7 +142,7 @@ export const productRoutes = new Elysia()
     }, {
       detail: {
         summary: "Update a product",
-        tags: ["Product Route"],
+        tags: ["Products"],
       },
       params: z.object({
         id: z.string(),
@@ -140,6 +154,15 @@ export const productRoutes = new Elysia()
     })
     .delete("/products/:id", async function ({ params }: ProductParams): Promise<{ success: boolean; message: string; }> {
       const productId = params.id
+
+      const product = await db.query.products.findFirst({
+        where: eq(products.id, productId)
+      })
+
+      if (!product) {
+        throw new Error("Product not found")
+      }
+
       await db.delete(products).where(eq(products.id, productId))
 
       return {
@@ -149,7 +172,7 @@ export const productRoutes = new Elysia()
     }, {
       detail: {
         summary: "Delete a product",
-        tags: ["Product Route"],
+        tags: ["Products"],
       },
       params: z.object({
         id: z.string(),

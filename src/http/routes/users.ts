@@ -18,12 +18,17 @@ export const usersRoutes = new Elysia()
   .get("/users", async function () {
     const allUsers = await db.query.users.findMany()
 
-    return allUsers
+    // Converter Date para string para corresponder ao schema
+    return allUsers.map((user) => ({
+      ...user,
+      createdAt: user.createdAt.toISOString(),
+      updatedAt: user.updatedAt.toISOString(),
+    }))
   }, {
     // auth: false,
     detail: {
       summary: "List all users",
-      tags: ["Users Route"],
+      tags: ["Users"],
     },
     response: {
       200: z.array(z.object({
@@ -49,7 +54,7 @@ export const usersRoutes = new Elysia()
     auth: true,
     detail: {
       summary: "Get a user by ID",
-      tags: ["Users Route"],
+      tags: ["Users"],
     },
     params: z.object({
       id: z.string(),
@@ -99,7 +104,7 @@ export const usersRoutes = new Elysia()
     auth: true,
     detail: {
       summary: "Delete a user by ID",
-      tags: ["Users Route"],
+      tags: ["Users"],
     },
     params: z.object({
       id: z.string(),

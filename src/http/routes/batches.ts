@@ -50,7 +50,7 @@ export const batchesRoutes = new Elysia()
   }, {
     detail: {
       summary: "List all batches",
-      tags: ["Product Route"],
+      tags: ["Products", "Batches"],
     },
   })
   .get("/batches/:id", async function ({ params }: BatchParams): Promise<BatchOutputType> {
@@ -96,7 +96,7 @@ export const batchesRoutes = new Elysia()
   }, {
     detail: {
       summary: "Get a batch by ID",
-      tags: ["Product Route"],
+      tags: ["Products", "Batches"],
     },
     params: z.object({
       id: z.string(),
@@ -178,7 +178,7 @@ export const batchesRoutes = new Elysia()
   }, {
     detail: {
       summary: "Create a batch",
-      tags: ["Product Route"],
+      tags: ["Products", "Batches"],
     },
     body: CreateBatchInputSchema,
     response: {
@@ -236,7 +236,7 @@ export const batchesRoutes = new Elysia()
   }, {
     detail: {
       summary: "Sell units from a batch",
-      tags: ["Product Route"],
+      tags: ["Products", "Batches"],
     },
     params: z.object({
       id: z.string(),
@@ -248,6 +248,38 @@ export const batchesRoutes = new Elysia()
         message: z.string(),
         soldUnits: z.number(),
         availableUnits: z.number(),
+      }),
+    },
+  })
+  .delete("/batches/:id", async function ({ params }: BatchParams): Promise<{ success: boolean; message: string; }> {
+    const batchId = params.id
+
+    const batch = await db.query.batches.findFirst({
+      where: eq(batches.id, batchId)
+    })
+
+    if (!batch) {
+      throw new Error("Batch not found")
+    }
+
+    await db.delete(batches).where(eq(batches.id, batchId))
+
+    return {
+      success: true,
+      message: "Batch deleted successfully",
+    }
+  }, {
+    detail: {
+      summary: "Delete a batch",
+      tags: ["Products", "Batches"],
+    },
+    params: z.object({
+      id: z.string(),
+    }),
+    response: {
+      200: z.object({
+        success: z.boolean(),
+        message: z.string(),
       }),
     },
   })
