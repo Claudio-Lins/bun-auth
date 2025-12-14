@@ -1,7 +1,7 @@
 # =========================
 # BUILD STAGE
 # =========================
-FROM oven/bun:1.1.26 AS build
+FROM --platform=linux/amd64 oven/bun:1.1.26 AS build
 
 WORKDIR /app
 
@@ -23,7 +23,7 @@ RUN bun build.ts \
 # =========================
 # RUNTIME STAGE
 # =========================
-FROM debian:bookworm-slim
+FROM --platform=linux/amd64 debian:bookworm-slim
 
 WORKDIR /app
 

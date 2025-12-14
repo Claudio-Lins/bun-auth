@@ -5,13 +5,19 @@ try {
   // Ignorar erro se o diretório já existir
 }
 
-// Detectar arquitetura do sistema
+// Detectar arquitetura do sistema ou usar variável de ambiente
 const arch = process.arch;
 const platform = process.platform;
+const buildArch = process.env.BUILD_ARCH;
 
 // Mapear arquitetura do Node para target do Bun
+// Priorizar variável de ambiente BUILD_ARCH se definida
 let compileTarget: "bun-linux-x64" | "bun-linux-arm64";
-if (platform === "linux") {
+if (buildArch === "arm64" || buildArch === "aarch64") {
+  compileTarget = "bun-linux-arm64";
+} else if (buildArch === "x64" || buildArch === "amd64") {
+  compileTarget = "bun-linux-x64";
+} else if (platform === "linux") {
   if (arch === "x64") {
     compileTarget = "bun-linux-x64";
   } else if (arch === "arm64") {
@@ -25,7 +31,7 @@ if (platform === "linux") {
   compileTarget = "bun-linux-x64";
 }
 
-console.log(`Building for architecture: ${arch} (${platform}) -> ${compileTarget}`);
+console.log(`Building for architecture: ${arch} (${platform}) -> ${compileTarget}${buildArch ? ` (forced via BUILD_ARCH=${buildArch})` : ''}`);
 
 const result = await Bun.build({
   entrypoints: ["src/index.ts"],
