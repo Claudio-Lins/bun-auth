@@ -28,7 +28,7 @@ FROM gcr.io/distroless/base-debian12
 
 WORKDIR /app
 
-COPY --from=build /app/server ./server
+COPY --from=build /app/build/server ./server
 
 ENV NODE_ENV=production
 EXPOSE 3333
