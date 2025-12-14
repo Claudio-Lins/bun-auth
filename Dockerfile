@@ -9,33 +9,30 @@ WORKDIR /app
 COPY package.json .
 COPY bun.lockb* ./
 
-RUN bun install --frozen-lockfile
-# ▲ MUDANÇA: garante build reprodutível
+RUN bun install --frozen-lockfile --production=false
 
 # Copia o restante do projeto
 COPY ./src ./src
-COPY ./build.ts ./build.ts
 COPY ./tsconfig.json ./tsconfig.json
-
-RUN bun build.ts \
- && chmod +x /app/build/server
 
 # =========================
 # RUNTIME STAGE
 # =========================
-FROM --platform=linux/amd64 debian:bookworm-slim
+FROM --platform=linux/amd64 oven/bun:1.1.26
 
 WORKDIR /app
 
-# Instalar dependências mínimas necessárias para executar binários compilados
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
+# Copiar apenas dependências de produção
+COPY package.json .
+COPY bun.lockb* ./
 
-COPY --from=build /app/build/server ./server
+RUN bun install --frozen-lockfile --production
+
+# Copiar código fonte
+COPY --from=build /app/src ./src
+COPY --from=build /app/tsconfig.json ./tsconfig.json
 
 ENV NODE_ENV=production
 EXPOSE 3333
 
-CMD ["./server"]
+CMD ["bun", "run", "src/index.ts"]

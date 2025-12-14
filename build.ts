@@ -33,24 +33,59 @@ if (buildArch === "arm64" || buildArch === "aarch64") {
 
 console.log(`Building for architecture: ${arch} (${platform}) -> ${compileTarget}${buildArch ? ` (forced via BUILD_ARCH=${buildArch})` : ''}`);
 
-const result = await Bun.build({
-  entrypoints: ["src/index.ts"],
-  outdir: "./build",
-  target: "bun",
-  minify: {
-    whitespace: true,
-    syntax: true,
-    identifiers: true,
-    keepNames: true,
-  },
-  compile: {
-    target: compileTarget,
-  },
-})
+let result;
+try {
+  result = await Bun.build({
+    entrypoints: ["src/index.ts"],
+    outdir: "./build",
+    target: "bun",
+    minify: {
+      whitespace: true,
+      syntax: true,
+      identifiers: true,
+      keepNames: true,
+    },
+    compile: {
+      target: compileTarget,
+    },
+  })
 
-if (!result.success) {
-  console.error("Build failed");
-  console.error("Outputs:", result.outputs);
+  console.log("Build result:", {
+    success: result.success,
+    outputsCount: result.outputs?.length || 0,
+    outputs: result.outputs?.map((o: any) => ({ path: o.path, kind: o.kind })) || []
+  });
+
+  if (!result.success) {
+    console.error("Build failed");
+    console.error("Outputs:", result.outputs);
+    
+    // Verificar se há erros de compilação
+    if (result.outputs && result.outputs.length === 0) {
+      console.error("No outputs generated. This might indicate a compilation error.");
+      console.error("Trying to compile without minify to see errors...");
+      
+      // Tentar build sem minify para ver erros
+      const debugResult = await Bun.build({
+        entrypoints: ["src/index.ts"],
+        outdir: "./build",
+        target: "bun",
+        compile: {
+          target: compileTarget,
+        },
+      });
+      
+      console.error("Debug build result:", {
+        success: debugResult.success,
+        outputsCount: debugResult.outputs?.length || 0
+      });
+    }
+    
+    process.exit(1);
+  }
+} catch (error) {
+  console.error("Build error:", error);
+  console.error(JSON.stringify({ error: String(error), stack: error instanceof Error ? error.stack : undefined }, null, 2));
   process.exit(1);
 }
 
