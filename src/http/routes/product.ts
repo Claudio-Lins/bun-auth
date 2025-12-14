@@ -15,8 +15,17 @@ type ProductParams = {
 export const productRoutes = new Elysia()
   .get("/products", async function () {
     const allProducts = await db.query.products.findMany({
+      where: eq(products.softDelete, false),
       with: {
-        variants: true,
+        variants: {
+          with: {
+            batches: {
+              with: {
+                units: true,
+              }
+            }
+          }
+        },
       }
     })
 
@@ -187,3 +196,67 @@ export const productRoutes = new Elysia()
         }),
       },
     })
+    .patch(
+  "/products/:id/soft-delete",
+  async function ({ params }): Promise<ProductOutputType> {
+    const productId = params.id;
+
+    await db
+      .update(products)
+      .set({
+        softDelete: true,
+        updatedAt: new Date(),
+      })
+      .where(eq(products.id, productId));
+
+    const product = await db.query.products.findFirst({
+      where: eq(products.id, productId),
+      with: {
+        variants: true,
+      },
+    });
+
+    if (!product) {
+      throw new Error("Product not found");
+    }
+
+    return {
+      ...product,
+      createdAt: product.createdAt.toISOString(),
+      updatedAt: product.updatedAt.toISOString(),
+      variants: product.variants?.map((variant) => ({
+        ...variant,
+        createdAt: variant.createdAt.toISOString(),
+        updatedAt: variant.updatedAt.toISOString(),
+      })),
+    } as ProductOutputType;
+  },
+  {
+    requireRole: "MANAGER",
+    detail: {
+      summary: "Soft delete product",
+      tags: ["Products"],
+    },
+    params: z.object({
+      id: z.string(),
+    }),
+    response: {
+      200: ProductOutputSchema,
+    },
+  }
+)
+.patch("/products/:id/restore", async function ({ params }) {
+  await db
+    .update(products)
+    .set({ softDelete: false })
+    .where(eq(products.id, params.id));
+}, {
+  requireRole: "MANAGER",
+  detail: {
+    summary: "Restore a product",
+    tags: ["Products"],
+  },
+  params: z.object({
+    id: z.string(),
+  }),
+});

@@ -4,7 +4,9 @@ import { popcornUnits, popcornUnitsRelations } from "./popcorn-units";
 import { productVariants, productVariantsRelations } from "./product-variants";
 import { products, productsRelations } from "./products";
 import { sessions } from "./sessions";
-import { users } from "./users";
+import { userAddresses, userAddressesRelations } from "./user-addresses";
+import { userContacts, userContactsRelations } from "./user-contacts";
+import { users, usersRelations } from "./users";
 import { verifications } from "./verifications";
 
 export const schema = {
@@ -20,4 +22,9 @@ export const schema = {
   productVariantsRelations,
   products,
   productsRelations,
+  userContacts,
+  userContactsRelations,
+  userAddresses,
+  userAddressesRelations,
+  usersRelations,
 }
