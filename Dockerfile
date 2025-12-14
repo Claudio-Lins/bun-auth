@@ -23,10 +23,15 @@ RUN bun build.ts \
 # =========================
 # RUNTIME STAGE
 # =========================
-FROM gcr.io/distroless/base-debian12
-# ▲ MUDANÇA: versão explícita (mais previsível)
+FROM debian:bookworm-slim
 
 WORKDIR /app
+
+# Instalar dependências mínimas necessárias para executar binários compilados
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY --from=build /app/build/server ./server
 
