@@ -1,6 +1,10 @@
 await Bun.build({
   entrypoints: ["src/index.ts"],
-  outdir: "./build",
+
+  // 🔥 REMOVIDO: outdir
+  // outdir: "./build",
+
+  target: "bun",
 
   minify: {
     whitespace: true,
@@ -11,9 +15,10 @@ await Bun.build({
 
   compile: {
     target: "bun-linux-x64",
-    outfile: "server",
+
+    // ✅ Caminho ABSOLUTO e EXPLÍCITO
+    outfile: "./build/server",
   },
-});
+})
 
-export { };
-
+export { }
