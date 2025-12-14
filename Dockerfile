@@ -17,7 +17,8 @@ COPY ./src ./src
 COPY ./build.ts ./build.ts
 COPY ./tsconfig.json ./tsconfig.json
 
-RUN bun build.ts
+RUN bun build.ts \
+ && chmod +x /app/build/server
 
 # =========================
 # RUNTIME STAGE
