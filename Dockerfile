@@ -17,8 +17,7 @@ COPY ./src ./src
 COPY ./build.ts ./build.ts
 COPY ./tsconfig.json ./tsconfig.json
 
-RUN bun build.ts \
- && chmod +x /app/build/server
+RUN bun build.ts && chmod +x /app/server
 
 # =========================
 # RUNTIME STAGE
@@ -28,7 +27,7 @@ FROM gcr.io/distroless/base-debian12
 
 WORKDIR /app
 
-COPY --from=build /app/build/server ./server
+COPY --from=build /app/server ./server
 
 ENV NODE_ENV=production
 EXPOSE 3333
