@@ -259,4 +259,30 @@ export const productRoutes = new Elysia()
   params: z.object({
     id: z.string(),
   }),
-});
+})
+.delete("/products/:id", async function ({ params }: ProductParams): Promise<{ success: boolean; message: string; }> {
+  const productId = params.id
+
+  await db.delete(products).where(eq(products.id, productId))
+
+  return {
+    success: true,
+    message: "Product deleted successfully",
+  }
+}, {
+  auth: true,
+  requireRole: "ADMIN",
+  detail: {
+    summary: "Delete a product",
+    tags: ["Products"],
+  },
+  params: z.object({
+    id: z.string(),
+  }),
+  response: {
+    200: z.object({
+      success: z.boolean(),
+      message: z.string(),
+    }),
+  },
+})
