@@ -15,12 +15,22 @@ type BatchParams = {
 }
 
 export const batchesRoutes = new Elysia()
-  .get("/batches", async function () {
-    const allBatches = await db.query.batches.findMany({
-      with: {
-        units: true,
-      }
-    })
+  .get("/batches", async function ({ query }: { query?: { variantId?: string } }) {
+    // Adicionar filtro por variantId se fornecido
+    const allBatches = query?.variantId
+      ? await db.query.batches.findMany({
+        where: eq(batches.productVariantId, query.variantId),
+        orderBy: (batches, { desc }) => [desc(batches.productionDate)],
+        with: {
+          units: true,
+        }
+      })
+    : await db.query.batches.findMany({
+        orderBy: (batches, { desc }) => [desc(batches.productionDate)],
+        with: {
+          units: true,
+        }
+      })
 
     // Converter Date para string e calcular resumo de unidades
     return allBatches.map((batch) => {
@@ -49,9 +59,12 @@ export const batchesRoutes = new Elysia()
     })
   }, {
     detail: {
-      summary: "List all batches",
+      summary: "List all batches (optionally filtered by variantId)",
       tags: ["Products", "Batches"],
     },
+    query: z.object({
+      variantId: z.string().optional(),
+    }).optional(),
   })
   .get("/batches/:id", async function ({ params }: BatchParams): Promise<BatchOutputType> {
     const batchId = params.id

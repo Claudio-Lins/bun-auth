@@ -22,6 +22,20 @@
       "when": 1765664040210,
       "tag": "0002_public_mandarin",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1765883266419,
+      "tag": "0003_mature_pyro",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1765906359849,
+      "tag": "0004_short_hulk",
+      "breakpoints": true
     }
   ]
 }

@@ -6,6 +6,7 @@ import { productVariants } from "./product-variants";
 
 export const products = pgTable("products", {
   id: text("id").primaryKey().$defaultFn(() => randomUUIDv7()),
+  prefix: text("prefix"),
   name: text("name").notNull(),
   description: text("description"),
   isActive: boolean("is_active").default(true).notNull(),

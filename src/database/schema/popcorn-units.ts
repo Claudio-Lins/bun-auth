@@ -2,6 +2,7 @@ import { randomUUIDv7 } from "bun";
 import { relations } from "drizzle-orm";
 import { boolean, index, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { batches } from "./batches";
+import { eventUnits } from "./event-units";
 
 
 export const popcornUnits = pgTable("popcorn_units", {
@@ -32,9 +33,12 @@ export const popcornUnits = pgTable("popcorn_units", {
 
 
 // Unidade ligada ao lote e opcionalmente à variante diretamente.
-export const popcornUnitsRelations = relations(popcornUnits, ({ one }) => ({
+export const popcornUnitsRelations = relations(popcornUnits, ({ one, many }) => ({
   batch: one(batches, {
     fields: [popcornUnits.batchId],
     references: [batches.id],
-  })
+  }),
+  
+  // Adicionar relacionamento com eventos
+  eventAllocations: many(eventUnits), // popcorn_unit → muitas event_units
 }));

@@ -1,5 +1,7 @@
 import { accounts } from "./accounts";
 import { batches, batchesRelations } from "./batches";
+import { eventUnits, eventUnitsRelations } from "./event-units";
+import { events, eventsRelations } from "./events";
 import { popcornUnits, popcornUnitsRelations } from "./popcorn-units";
 import { productVariants, productVariantsRelations } from "./product-variants";
 import { products, productsRelations } from "./products";
@@ -22,6 +24,10 @@ export const schema = {
   productVariantsRelations,
   products,
   productsRelations,
+  events,
+  eventsRelations,
+  eventUnits,
+  eventUnitsRelations,
   userContacts,
   userContactsRelations,
   userAddresses,

@@ -1,6 +1,7 @@
 import { Elysia } from "elysia";
 import { adminRoutes } from "./admin";
 import { batchesRoutes } from "./batches";
+import { eventsRoutes } from "./events";
 import { healthRoutes } from "./health";
 import { popcornUnitRoutes } from "./popcorn-unit";
 import { productRoutes } from "./product";
@@ -19,3 +20,4 @@ export const routes = new Elysia()
   .use(productVariantRoutes)
   .use(batchesRoutes)
   .use(popcornUnitRoutes)
+  .use(eventsRoutes)

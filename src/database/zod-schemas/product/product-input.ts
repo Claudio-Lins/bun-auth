@@ -6,6 +6,7 @@ import { z } from "zod";
  * Valida os dados de criação de produto
  */
 export const CreateProductInputSchema = z.object({
+  prefix: z.string().min(2, "Prefixo muito curto."),
   name: z.string().min(2, "Nome muito curto."),
   description: z.string().optional(),
   isActive: z.boolean().optional().default(true),
@@ -16,6 +17,7 @@ export const CreateProductInputSchema = z.object({
 
 export const UpdateProductInputSchema = z.object({
   id: z.string(),
+  prefix: z.string().min(2, "Prefixo muito curto.").optional(),
   name: z.string().min(2, "Nome muito curto.").optional(),
   description: z.string().optional(),
   isActive: z.boolean().optional().default(true),
