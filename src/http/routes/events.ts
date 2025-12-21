@@ -125,6 +125,14 @@ async function allocateUnitsToEvent(params: {
       .where(inArray(popcornUnits.id, unitIds));
   }
 
+  // 4. Atualizar o contador allocatedUnits no evento
+  await db
+    .update(events)
+    .set({ 
+      allocatedUnits: sql`${events.allocatedUnits} + ${inserted.length}` 
+    })
+    .where(eq(events.id, eventId));
+
   return inserted;
 }
 
@@ -153,24 +161,44 @@ async function releaseUnitsFromEvent(eventId: string, unitIds?: string[]) {
       .where(inArray(popcornUnits.id, releasedUnitIds));
   }
 
+  // Atualizar o contador allocatedUnits no evento (decrementar)
+  if (released.length > 0) {
+    await db
+      .update(events)
+      .set({ 
+        allocatedUnits: sql`${events.allocatedUnits} - ${released.length}` 
+      })
+      .where(eq(events.id, eventId));
+  }
+
   return released;
 }
 
 function formatEventWithRelations(event: any): EventOutputType {
-  // Calcular resumo de unidades alocadas
-  const allocatedUnits = event.allocatedUnits || [];
-  const totalAllocated = allocatedUnits.length;
-  const currentlyAllocated = allocatedUnits.filter((u: any) => !u.releasedAt).length;
-  const released = allocatedUnits.filter((u: any) => u.releasedAt).length;
+  // Separar o array de relações do campo numérico
+  // Quando fazemos query com 'with', allocatedUnits vira um array, mas o schema espera número
+  const allocatedUnitsArray = Array.isArray(event.allocatedUnits) ? event.allocatedUnits : [];
+  const allocatedUnitsCount = typeof event.allocatedUnits === 'number' 
+    ? event.allocatedUnits 
+    : allocatedUnitsArray.length;
+
+  // Calcular resumo de unidades alocadas a partir do array de relações
+  const totalAllocated = allocatedUnitsArray.length;
+  const currentlyAllocated = allocatedUnitsArray.filter((u: any) => !u.releasedAt).length;
+  const released = allocatedUnitsArray.filter((u: any) => u.releasedAt).length;
+
+  // Remover o array allocatedUnits do objeto (é uma relação, não o campo do schema)
+  const { allocatedUnits: _, ...eventData } = event;
 
   return {
-    ...event,
+    ...eventData,
+    allocatedUnits: allocatedUnitsCount, // Usar o número do campo do banco
     eventDate: event.eventDate instanceof Date ? event.eventDate.toISOString().split('T')[0] : event.eventDate,
-    startTime: event.startTime instanceof Date ? event.startTime.toISOString() : event.startTime,
-    endTime: event.endTime instanceof Date ? event.endTime.toISOString() : event.endTime,
+    startTime: event.startTime instanceof Date ? event.startTime.toISOString() : (event.startTime || null),
+    endTime: event.endTime instanceof Date ? event.endTime.toISOString() : (event.endTime || null),
     createdAt: event.createdAt instanceof Date ? event.createdAt.toISOString() : event.createdAt,
     updatedAt: event.updatedAt instanceof Date ? event.updatedAt.toISOString() : event.updatedAt,
-    deletedAt: event.deletedAt instanceof Date ? event.deletedAt.toISOString() : event.deletedAt,
+    deletedAt: event.deletedAt instanceof Date ? event.deletedAt.toISOString() : (event.deletedAt || null),
     unitsSummary: {
       totalAllocated,
       currentlyAllocated,
@@ -244,14 +272,14 @@ export const eventsRoutes = new Elysia()
     let startTime: Date | null = null;
     let endTime: Date | null = null;
 
-    if (body.startAt) {
+    if (body.startTime) {
       // Se startAt foi fornecido, usar ele para eventDate e startTime
-      const startAtDate = new Date(body.startAt);
+      const startAtDate = new Date(body.startTime);
       eventDate = startAtDate;
       startTime = startAtDate;
       
-      if (body.endAt) {
-        endTime = new Date(body.endAt);
+      if (body.endTime) {
+        endTime = new Date(body.endTime);
       }
     } else if (body.eventDate) {
       // Formato antigo: eventDate separado
@@ -259,7 +287,7 @@ export const eventsRoutes = new Elysia()
       startTime = body.startTime ? new Date(body.startTime) : null;
       endTime = body.endTime ? new Date(body.endTime) : null;
     } else {
-      throw new Error("Deve fornecer eventDate ou startAt");
+      throw new Error("Deve fornecer eventDate ou startTime e endTime");
     }
 
     // Converter strings de data para Date
@@ -272,7 +300,7 @@ export const eventsRoutes = new Elysia()
       imageUrl: body.imageUrl || null,
       status: body.status || "PLANNED",
       internalOwnerId: body.internalOwnerId,
-      allocatedUnits: body.allocatedUnits,
+      allocatedUnits: body.allocatedUnits || 0, // Inicia com 0, será atualizado quando unidades forem alocadas
       maxSalesCapacity: body.maxSalesCapacity || null,
       eventPrice: body.eventPrice || "0",
       transportCost: body.transportCost || null,
@@ -291,21 +319,10 @@ export const eventsRoutes = new Elysia()
       throw new Error("Failed to create event");
     }
 
-    // Alocar unidades automaticamente se especificado
-    if (body.allocatedUnits > 0) {
-      try {
-        await allocateUnitsToEvent({
-          eventId: event.id,
-          quantity: body.allocatedUnits,
-        });
-      } catch (error) {
-        // Se falhar na alocação, deletar o evento criado
-        await db.delete(events).where(eq(events.id, event.id));
-        throw error;
-      }
-    }
+    // Nota: Unidades devem ser alocadas depois via /events/:id/allocate-units
+    // Isso permite escolher unidades específicas de diferentes batches e variants
 
-    // Buscar evento com unidades alocadas
+    // Buscar evento criado (sem unidades alocadas ainda)
     const eventWithUnits = await db.query.events.findFirst({
       where: eq(events.id, event.id),
       with: {

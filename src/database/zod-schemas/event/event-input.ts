@@ -13,13 +13,11 @@ export const CreateEventInputSchema = z.object({
   eventDate: z.string().optional(), // ISO string date
   startTime: z.string().optional(), // ISO string timestamp
   endTime: z.string().optional(), // ISO string timestamp
-  // Formato novo: startAt/endAt (preferido)
-  startAt: z.string().optional(), // ISO string timestamp
-  endAt: z.string().optional(), // ISO string timestamp
   imageUrl: z.string().optional(), // Aceita qualquer string ou vazio
   status: z.enum(["PLANNED", "CONFIRMED", "CANCELLED", "FINISHED"]).default("PLANNED"),
   internalOwnerId: z.string(),
-  allocatedUnits: z.number().int().positive("Deve alocar pelo menos 1 unidade"),
+  allocatedUnits: z.number().int().min(0).optional().default(0),
+  // Nota: allocatedUnits será atualizado automaticamente quando unidades forem alocadas via /events/:id/allocate-units
   maxSalesCapacity: z.number().int().positive().optional(),
   eventPrice: z.string().optional(), // numeric como string
   transportCost: z.string().optional(), // numeric como string
@@ -32,10 +30,10 @@ export const CreateEventInputSchema = z.object({
   addressCountry: z.string().optional().default("PT"),
 }).refine((data) => {
   // Deve ter eventDate OU startAt
-  return !!(data.eventDate || data.startAt);
+  return !!(data.eventDate || data.startTime || data.endTime);
 }, {
-  message: "Deve fornecer eventDate ou startAt",
-  path: ["startAt"],
+  message: "Deve fornecer eventDate ou startTime e endTime",
+  path: ["startTime", "endTime"],
 });
 
 /**

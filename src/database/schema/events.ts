@@ -36,8 +36,8 @@ export const events = pgTable("events", {
   // =========================
   // CAPACIDADE & UNIDADES
   // =========================
-  allocatedUnits: integer("allocated_units").notNull(),
-  // ▲ MUDANÇA: substitui initial_units → allocated_units
+  allocatedUnits: integer("allocated_units").default(0).notNull(),
+  // ▲ Unidades físicas alocadas (será atualizado conforme unidades são alocadas via /events/:id/allocate-units)
 
   maxSalesCapacity: integer("max_sales_capacity"),
   // ▲ MUDANÇA: controle de limite de vendas no evento
