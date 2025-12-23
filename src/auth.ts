@@ -4,13 +4,13 @@ import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { admin as adminPlugin, openAPI } from 'better-auth/plugins';
 import { ac, admin, manager, user } from './auth/permissions';
-import { sendEmail } from './services/email.service';
 import { resetPasswordTemplate } from './emails/reset-password.template';
 import { env } from './env';
+import { sendEmail } from './services/email.service';
 
 export const auth = betterAuth({
   basePath: '/api/auth',
-  trustedOrigins: ["http://localhost:3000"],
+  trustedOrigins: ["http://localhost:3000","https://admin.popjoypipocas.com"],
   plugins: [
     openAPI(),
     adminPlugin({

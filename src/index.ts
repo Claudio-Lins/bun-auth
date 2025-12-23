@@ -1,10 +1,8 @@
 import { auth } from "@/auth";
 import { cors } from "@elysiajs/cors";
 import { openapi } from "@elysiajs/openapi";
-import { eq } from "drizzle-orm";
 import { Elysia } from "elysia";
 import { z } from "zod/v4";
-import { db } from "./database/client";
 
 import { betterAuthPlugin, OpenAPI } from "./http/plugins/better-auth";
 import { routes } from "./http/routes";
@@ -20,7 +18,7 @@ async function startServer() {
 
     const app = new Elysia()
       .use(cors({
-        origin: "http://localhost:3000",
+        origin: ["http://localhost:3000","https://admin.popjoypipocas.com"],
         credentials: true,
       }))
       .use(openapi({
