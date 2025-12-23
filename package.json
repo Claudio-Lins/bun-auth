@@ -18,6 +18,7 @@
     "drizzle-orm": "^0.44.5",
     "elysia": "latest",
     "pg": "^8.16.3",
+    "resend": "^6.6.0",
     "zod": "^4.1.11"
   },
   "devDependencies": {

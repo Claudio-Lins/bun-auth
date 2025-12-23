@@ -1,0 +1,35 @@
+{
+  "mcpServers": {
+    "supabase": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@supabase/mcp-server-supabase@latest",
+        "--access-token",
+        "sbp_b33b102c87748608a7a5a018d452d0ae302df7d1"
+      ]
+    },
+    "context7": {
+      "httpUrl": "https://mcp.context7.com/mcp",
+      "headers": {
+        "CONTEXT7_API_KEY": "ctx7sk-fd49fe36-25f1-49c0-bfb4-8834d3832bcc",
+        "Accept": "application/json, text/event-stream"
+      }
+    },
+    "TestSprite": {
+      "command": "npx",
+      "args": ["@testsprite/testsprite-mcp@latest"],
+      "env": {
+        "API_KEY": "sk-user-vFurnbE767c3EBjySU7tzu_krII52MfEqOI39WgkE_0WOxngMyw5Wrq0R16EylpSrotTH1-ENBeRoZX6eDGmc-0qTtQiSiOvR6oNvF5REOkLoWxKlEoLX7Egqq_KOEW8gao"
+      }
+    },
+    "@magicuidesign/mcp": {
+      "command": "npx",
+      "args": ["-y", "@magicuidesign/mcp@latest"]
+    },
+    "shadcn": {
+      "command": "npx",
+      "args": ["shadcn@latest", "mcp"]
+    }
+  }
+}
