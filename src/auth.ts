@@ -67,14 +67,21 @@ export const auth = betterAuth({
     },
     sendResetPassword: async ({ user, url, token }, request) => {
       // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/89dfd59f-5051-44a9-a586-4f79967ee771',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'auth.ts:sendResetPassword',message:'URL recebida do Better Auth',data:{originalUrl:url,hasToken:!!token,tokenValue:token,nodeEnv:process.env.NODE_ENV,frontendUrl:env.FRONTEND_URL},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+      fetch('http://127.0.0.1:7242/ingest/89dfd59f-5051-44a9-a586-4f79967ee771',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'auth.ts:sendResetPassword',message:'URL recebida do Better Auth',data:{originalUrl:url,hasToken:!!token,tokenValue:token,nodeEnv:process.env.NODE_ENV,frontendUrl:env.FRONTEND_URL,requestHost:request?.headers?.get?.('host')},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
       // #endregion
       
       // Determinar URL do frontend baseado no ambiente
-      const frontendUrl = env.FRONTEND_URL || 
-        (process.env.NODE_ENV === 'production' 
-          ? 'https://admin.popjoypipocas.com' 
-          : 'http://localhost:3000');
+      // Detectar ambiente pelo host da requisição (mais confiável que NODE_ENV)
+      const requestHost = request?.headers?.get?.('host') || '';
+      const isProduction = requestHost.includes('admin.popjoypipocas.com') || 
+                          requestHost.includes('popjoypipocas.com') ||
+                          (process.env.NODE_ENV === 'production' && !requestHost.includes('localhost'));
+      
+      // Sempre usar detecção automática para evitar inversão de lógica
+      // Se FRONTEND_URL estiver definido incorretamente, será ignorado
+      const frontendUrl = isProduction 
+        ? 'https://admin.popjoypipocas.com' 
+        : 'http://localhost:3000';
       
       // Extrair token da URL original ou usar o token fornecido
       let resetToken = token;
