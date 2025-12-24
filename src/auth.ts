@@ -8,6 +8,21 @@ import { resetPasswordTemplate } from './emails/reset-password.template';
 import { env } from './env';
 import { sendEmail } from './services/email.service';
 
+// Configurar baseURL para produção (necessário para cookies funcionarem corretamente)
+// Usar função para evitar problemas com minificação do Bun
+function getBaseURL(): string {
+  if (process.env.BETTER_AUTH_URL) {
+    return process.env.BETTER_AUTH_URL;
+  }
+  if (process.env.NODE_ENV === 'production') {
+    return 'https://popjoy-api.claudiolins.eu';
+  }
+  return 'http://localhost:3333';
+}
+const baseURL = getBaseURL();
+
+export { baseURL };
+
 // Configurar origens confiáveis para Better Auth
 const trustedOrigins = process.env.CORS_ORIGIN
   ? process.env.CORS_ORIGIN.split(',').map(origin => origin.trim())
@@ -21,7 +36,8 @@ const trustedOrigins = process.env.CORS_ORIGIN
 console.log('🔐 Better Auth Config:', {
   basePath: '/api/auth',
   nodeEnv: process.env.NODE_ENV,
-  trustedOrigins: ["http://localhost:3000","https://admin.popjoypipocas.com"],
+  baseURL,
+  trustedOrigins,
 });
 
 export const auth = betterAuth({
