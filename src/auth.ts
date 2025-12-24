@@ -22,13 +22,16 @@ function getBaseURL(): string {
 }
 const baseURL = getBaseURL();
 
+// Determine if it's production based on URL or NODE_ENV
+const isProduction = baseURL.startsWith('https://') || process.env.NODE_ENV === 'production';
+
 console.log('🔐 Better Auth Config:', {
   baseURL,
   basePath: '/api/auth',
   nodeEnv: process.env.NODE_ENV,
   trustedOrigins: ["http://localhost:3000","https://admin.popjoypipocas.com"],
-  cookieSameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-  cookieSecure: process.env.NODE_ENV === 'production',
+  cookieSameSite: isProduction ? 'none' : 'lax',
+  cookieSecure: isProduction,
 });
 
 export const auth = betterAuth({
@@ -88,11 +91,11 @@ export const auth = betterAuth({
     },
     // Em desenvolvimento, desabilitar Secure para funcionar em HTTP (localhost)
     // Em produção, Secure é obrigatório quando sameSite=none
-    useSecureCookies: process.env.NODE_ENV === 'production',
+    useSecureCookies: isProduction,
     defaultCookieAttributes: {
       // Para cross-domain (frontend e API em domínios diferentes), precisa ser 'none'
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-      secure: process.env.NODE_ENV === 'production', // HTTPS only em produção (obrigatório com sameSite: none)
+      sameSite: isProduction ? 'none' : 'lax',
+      secure: isProduction, // HTTPS only em produção (obrigatório com sameSite: none)
       httpOnly: true,
       path: '/',
       // Não definir domain para permitir cross-domain
@@ -165,8 +168,8 @@ export const auth = betterAuth({
     },
     cookieOptions: {
       // Para cross-domain (frontend e API em domínios diferentes), precisa ser 'none'
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-      secure: process.env.NODE_ENV === 'production', // HTTPS only em produção (obrigatório com sameSite: none)
+      sameSite: isProduction ? 'none' : 'lax',
+      secure: isProduction, // HTTPS only em produção (obrigatório com sameSite: none)
       httpOnly: true,
       path: '/',
       // Não definir domain para permitir cross-domain
