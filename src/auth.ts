@@ -22,6 +22,8 @@ function getBaseURL(): string {
 }
 const baseURL = getBaseURL();
 
+export { baseURL };
+
 // Determine if it's production based on URL or NODE_ENV
 const isProduction = baseURL.startsWith('https://') || process.env.NODE_ENV === 'production';
 
