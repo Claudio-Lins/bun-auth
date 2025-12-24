@@ -20,7 +20,6 @@ const trustedOrigins = process.env.CORS_ORIGIN
     ];
 
 console.log('🔐 Better Auth Config:', {
-  baseURL,
   basePath: '/api/auth',
   nodeEnv: process.env.NODE_ENV,
   trustedOrigins: ["http://localhost:3000","https://admin.popjoypipocas.com"],
