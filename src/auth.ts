@@ -11,7 +11,7 @@ import { sendEmail } from './services/email.service';
 
 export const auth = betterAuth({
   basePath: '/api/auth',
-  trustedOrigins: ["http://localhost:3000","https://admin.popjoypipocas.com"],
+  trustedOrigins: ["http://localhost:3000","https://admin.popjoypipocas.com","http://localhost:3333", "https://popjoy-api.claudiolins.eu"],
   plugins: [
     openAPI(),
     adminPlugin({

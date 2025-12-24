@@ -18,7 +18,7 @@ async function startServer() {
 
     const app = new Elysia()
       .use(cors({
-        origin: ["http://localhost:3000","https://admin.popjoypipocas.com"],
+        origin: ["http://localhost:3000","https://admin.popjoypipocas.com", "https://popjoy-api.claudiolins.eu"],
         credentials: true,
       }))
       .use(openapi({
