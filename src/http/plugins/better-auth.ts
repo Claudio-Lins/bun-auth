@@ -7,8 +7,16 @@ import Elysia from "elysia";
 export const betterAuthPlugin = new Elysia({ name: "better-auth" })
   .all("/api/auth/*", async ({ request, set }) => {
     try {
+      // Criar um novo Request com headers normalizados para garantir compatibilidade cross-domain
+      // Isso é necessário porque o Better Auth pode precisar de headers específicos em cross-domain
+      const normalizedRequest = new Request(request.url, {
+        method: request.method,
+        headers: request.headers,
+        body: request.body,
+      });
+      
       // Chamar o handler do Better Auth
-      const response = await auth.handler(request);
+      const response = await auth.handler(normalizedRequest);
       
       // Copiar status code
       set.status = response.status;
@@ -52,6 +60,7 @@ export const betterAuthPlugin = new Elysia({ name: "better-auth" })
     auth: {
       async resolve({ status, request: { headers } }) {
         const session = await auth.api.getSession({ headers })
+        
         if (!session) {
           return status(401, { message: "Unauthorized" })
         }
