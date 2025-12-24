@@ -2,7 +2,6 @@ import { accounts } from "./accounts";
 import { batches, batchesRelations } from "./batches";
 import { eventUnits, eventUnitsRelations } from "./event-units";
 import { events, eventsRelations } from "./events";
-import { passkeys, passkeysRelations } from "./passkey";
 import { popcornUnits, popcornUnitsRelations } from "./popcorn-units";
 import { productVariants, productVariantsRelations } from "./product-variants";
 import { products, productsRelations } from "./products";
@@ -34,6 +33,4 @@ export const schema = {
   userAddresses,
   userAddressesRelations,
   usersRelations,
-  passkeys,
-  passkeysRelations,
 }

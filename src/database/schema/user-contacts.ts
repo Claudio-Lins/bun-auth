@@ -1,12 +1,10 @@
-
-import { relations, sql } from "drizzle-orm";
+import { randomUUIDv7 } from "bun";
+import { relations } from "drizzle-orm";
 import { boolean, index, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { users } from "./users";
 
 export const userContacts = pgTable("user_contacts", {
-  id: text("id")
-    .primaryKey()
-    .default(sql`gen_random_uuid()`),
+  id: text("id").primaryKey().$defaultFn(() => randomUUIDv7()),
   userId: text("user_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),

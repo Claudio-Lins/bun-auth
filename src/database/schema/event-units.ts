@@ -1,4 +1,5 @@
-import { relations, sql } from "drizzle-orm";
+import { randomUUIDv7 } from "bun";
+import { relations } from "drizzle-orm";
 import { index, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { events } from "./events";
 import { popcornUnits } from "./popcorn-units";
@@ -11,7 +12,7 @@ import { popcornUnits } from "./popcorn-units";
 export const eventUnits = pgTable("event_units", {
   id: text("id")
     .primaryKey()
-    .default(sql`gen_random_uuid()`),
+    .$defaultFn(() => randomUUIDv7()),
 
   eventId: text("event_id")
     .notNull()

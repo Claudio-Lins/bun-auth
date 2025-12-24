@@ -1,6 +1,5 @@
 import { db } from '@/database/client';
 import { schema } from '@/database/schema';
-import { passkey } from "@better-auth/passkey";
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { admin as adminPlugin, openAPI } from 'better-auth/plugins';
@@ -46,7 +45,6 @@ export const auth = betterAuth({
       },
       defaultRole: "user",
     }),
-    passkey(),
   ],
   user: {
     additionalFields: {
@@ -62,14 +60,10 @@ export const auth = betterAuth({
     user: {
       create: {
         before: async (userData) => {
-          // Gerar ID se não existir (generateId está false, mas garantimos o ID aqui para compatibilidade)
-          const userId = userData.id || crypto.randomUUID();
-          
           // Garantir que o campo role seja sempre "user" na criação
           return {
             data: {
               ...userData,
-              id: userId,
               role: userData.role || "user",
             },
           };
@@ -106,6 +100,10 @@ export const auth = betterAuth({
       verify: ({password, hash}) => Bun.password.verify(password, hash),
     },
     sendResetPassword: async ({ user, url, token }, request) => {
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/89dfd59f-5051-44a9-a586-4f79967ee771',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'auth.ts:sendResetPassword',message:'URL recebida do Better Auth',data:{originalUrl:url,hasToken:!!token,tokenValue:token,nodeEnv:process.env.NODE_ENV,frontendUrl:env.FRONTEND_URL,requestHost:request?.headers?.get?.('host')},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+      // #endregion
+      
       // Determinar URL do frontend baseado no ambiente
       // Detectar ambiente pelo host da requisição (mais confiável que NODE_ENV)
       const requestHost = request?.headers?.get?.('host') || '';
@@ -148,6 +146,10 @@ export const auth = betterAuth({
       
       // Construir nova URL apontando para o frontend
       const resetUrl = `${frontendUrl}${callbackURL}${resetToken ? `?token=${resetToken}` : ''}`;
+      
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/89dfd59f-5051-44a9-a586-4f79967ee771',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'auth.ts:sendResetPassword',message:'URL construída para frontend',data:{resetUrl,frontendUrl,callbackURL,resetToken},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+      // #endregion
       
       const html = resetPasswordTemplate(resetUrl);
       await sendEmail({
