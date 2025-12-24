@@ -164,7 +164,7 @@ export const auth = betterAuth({
     // Desabilitar cookieCache em produção para garantir que cookies sejam sempre retornados
     // Isso é necessário para cross-domain onde navegadores podem precisar de refresh periódico
     cookieCache: {
-      enabled: !isProduction, // Desabilitar em produção
+      enabled: true, 
       maxAge: 60 * 5 // 5 minutes
     },
     cookieOptions: {
