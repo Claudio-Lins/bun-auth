@@ -45,9 +45,20 @@ async function startServer() {
         
         // Log cookies sendo enviados (apenas para rotas de auth)
         if (path.startsWith('/api/auth')) {
-          const cookies = set.headers['set-cookie'] || [];
-          if (Array.isArray(cookies) && cookies.length > 0) {
-            console.log(`🍪 Cookies sendo enviados (${cookies.length}):`, cookies.map(c => c.split(';')[0]).join(', '));
+          const allHeaders = set.headers || {};
+          const cookies = allHeaders['set-cookie'] || allHeaders['Set-Cookie'] || [];
+          const cookieArray = Array.isArray(cookies) ? cookies : (cookies ? [cookies] : []);
+          
+          if (cookieArray.length > 0) {
+            console.log(`🍪 Cookies sendo enviados (${cookieArray.length}):`, cookieArray.map(c => {
+              const cookieStr = typeof c === 'string' ? c : String(c);
+              return cookieStr.split(';')[0];
+            }).join(', '));
+            // Log completo do cookie para debug
+            console.log(`🔍 Cookie completo:`, cookieArray[0]);
+          } else {
+            console.log(`⚠️  Nenhum cookie sendo enviado para ${path}`);
+            console.log(`🔍 Todos os headers da resposta:`, JSON.stringify(allHeaders, null, 2));
           }
         }
         

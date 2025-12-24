@@ -19,6 +19,15 @@ const trustedOrigins = process.env.CORS_ORIGIN
       "https://popjoy-api.claudiolins.eu"
     ];
 
+console.log('🔐 Better Auth Config:', {
+  baseURL,
+  basePath: '/api/auth',
+  nodeEnv: process.env.NODE_ENV,
+  trustedOrigins: ["http://localhost:3000","https://admin.popjoypipocas.com"],
+  cookieSameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+  cookieSecure: process.env.NODE_ENV === 'production',
+});
+
 export const auth = betterAuth({
   basePath: '/api/auth',
   trustedOrigins,
