@@ -33,6 +33,17 @@ async function startServer() {
         const path = url ? new URL(url).pathname : url;
         const timestamp = new Date().toISOString();
         
+        // Log cookies recebidos (apenas para rotas de auth)
+        if (path.startsWith('/api/auth')) {
+          const cookieHeader = request.headers.get('cookie') || '';
+          if (cookieHeader) {
+            const cookies = cookieHeader.split(';').map(c => c.trim().split('=')[0]);
+            console.log(`🍪 Cookies recebidos (${cookies.length}): ${cookies.join(', ')}`);
+          } else {
+            console.log(`⚠️  Nenhum cookie recebido na requisição ${path}`);
+          }
+        }
+        
         console.log(`[${timestamp}] 📥 ${method} ${path} | Origin: ${origin}`);
       })
       .onAfterHandle(function ({ request, set }) {
