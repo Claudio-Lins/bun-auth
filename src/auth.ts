@@ -19,6 +19,8 @@ const trustedOrigins = process.env.CORS_ORIGIN
       "https://popjoy-api.claudiolins.eu"
     ];
 
+export { baseURL };
+
 // Determine if it's production based on URL or NODE_ENV
 const isProduction = baseURL.startsWith('https://') || process.env.NODE_ENV === 'production';
 
