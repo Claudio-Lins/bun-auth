@@ -34,6 +34,14 @@ async function startServer() {
         const status = set.status || 200;
         const timestamp = new Date().toISOString();
         
+        // Log cookies sendo enviados (apenas para rotas de auth)
+        if (path.startsWith('/api/auth')) {
+          const cookies = set.headers['set-cookie'] || [];
+          if (Array.isArray(cookies) && cookies.length > 0) {
+            console.log(`🍪 Cookies sendo enviados (${cookies.length}):`, cookies.map(c => c.split(';')[0]).join(', '));
+          }
+        }
+        
         const statusColor = status >= 500 ? '🔴' : status >= 400 ? '🟡' : status >= 300 ? '🔵' : '🟢';
         console.log(`[${timestamp}] ${statusColor} ${method} ${path} ${status} | Origin: ${origin}`);
       })

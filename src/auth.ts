@@ -9,8 +9,15 @@ import { resetPasswordTemplate } from './emails/reset-password.template';
 import { env } from './env';
 import { sendEmail } from './services/email.service';
 
+// Configurar baseURL para produção (necessário para cookies funcionarem corretamente)
+const baseURL = process.env.BETTER_AUTH_URL || 
+                (process.env.NODE_ENV === 'production' 
+                  ? 'https://popjoy-api.claudiolins.eu' 
+                  : 'http://localhost:3333');
+
 export const auth = betterAuth({
   basePath: '/api/auth',
+  baseURL,
   trustedOrigins: ["http://localhost:3000","https://admin.popjoypipocas.com"],
   plugins: [
     openAPI(),
@@ -127,7 +134,13 @@ export const auth = betterAuth({
     expiresIn: 60 * 60 * 24 * 30, // 30 days
     cookieCache: {
       enabled: true,
-      maxAge: 60 * 5 // 30 days
+      maxAge: 60 * 5 // 5 minutes
+    },
+    cookieOptions: {
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production', // HTTPS only em produção
+      httpOnly: true,
+      path: '/',
     }
   }
 });
