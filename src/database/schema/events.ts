@@ -1,5 +1,4 @@
-import { randomUUIDv7 } from "bun";
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import { integer, numeric, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { eventUnits } from "./event-units";
 
@@ -10,7 +9,7 @@ import { eventUnits } from "./event-units";
 export const events = pgTable("events", {
   id: text("id")
     .primaryKey()
-    .$defaultFn(() => randomUUIDv7()),
+    .default(sql`gen_random_uuid()`),
 
   // =========================
   // INFORMAÇÕES BÁSICAS

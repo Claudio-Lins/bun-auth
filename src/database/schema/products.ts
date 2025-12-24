@@ -1,11 +1,12 @@
-import { randomUUIDv7 } from "bun";
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import { boolean, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { productVariants } from "./product-variants";
 
 
 export const products = pgTable("products", {
-  id: text("id").primaryKey().$defaultFn(() => randomUUIDv7()),
+  id: text("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
   prefix: text("prefix"),
   name: text("name").notNull(),
   description: text("description"),

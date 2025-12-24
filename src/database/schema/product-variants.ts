@@ -1,5 +1,4 @@
-import { randomUUIDv7 } from "bun";
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import { boolean, decimal, index, integer, numeric, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { batches } from "./batches";
 import { popcornUnits } from "./popcorn-units";
@@ -7,7 +6,9 @@ import { products } from "./products";
 
 
 export const productVariants = pgTable("product_variants", {
-  id: text("id").primaryKey().$defaultFn(() => randomUUIDv7()),
+  id: text("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
   productId: text("product_id").notNull().references(() => products.id, { onDelete: "cascade" }),
   weight: integer("weight"),
   retailPrice: decimal("retail_price", { precision: 10, scale: 2 }),

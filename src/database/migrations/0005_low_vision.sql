@@ -1,1 +1,0 @@
-ALTER TABLE "events" ALTER COLUMN "allocated_units" SET DEFAULT 0;

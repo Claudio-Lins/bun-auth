@@ -5,43 +5,15 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1765646909886,
-      "tag": "0000_classy_enchantress",
+      "when": 1766564269770,
+      "tag": "0000_fancy_namorita",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "7",
-      "when": 1765651912268,
-      "tag": "0001_lush_rachel_grey",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1765664040210,
-      "tag": "0002_public_mandarin",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1765883266419,
-      "tag": "0003_mature_pyro",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1765906359849,
-      "tag": "0004_short_hulk",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1765986800416,
-      "tag": "0005_low_vision",
+      "when": 1766568683115,
+      "tag": "0001_add_uuid_default_to_passkeys",
       "breakpoints": true
     }
   ]
