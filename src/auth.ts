@@ -78,6 +78,17 @@ export const auth = betterAuth({
   advanced: {
     database: {
       generateId: false
+    },
+    // Em desenvolvimento, desabilitar Secure para funcionar em HTTP (localhost)
+    // Em produção, Secure é obrigatório quando sameSite=none
+    useSecureCookies: process.env.NODE_ENV === 'production',
+    defaultCookieAttributes: {
+      // Para cross-domain (frontend e API em domínios diferentes), precisa ser 'none'
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      secure: process.env.NODE_ENV === 'production', // HTTPS only em produção (obrigatório com sameSite: none)
+      httpOnly: true,
+      path: '/',
+      // Não definir domain para permitir cross-domain
     }
   },
   emailAndPassword: {

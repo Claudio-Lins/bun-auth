@@ -5,7 +5,49 @@ import { eq } from "drizzle-orm";
 import Elysia from "elysia";
 
 export const betterAuthPlugin = new Elysia({ name: "better-auth" })
-  .mount(auth.handler)
+  .all("/api/auth/*", async ({ request, set }) => {
+    try {
+      // Chamar o handler do Better Auth
+      const response = await auth.handler(request);
+      
+      // Copiar status code
+      set.status = response.status;
+      
+      // Coletar todos os cookies Set-Cookie
+      const setCookieValues: string[] = [];
+      
+      // Copiar todos os headers
+      response.headers.forEach((value, key) => {
+        const lowerKey = key.toLowerCase();
+        if (lowerKey === 'set-cookie') {
+          setCookieValues.push(value);
+        } else {
+          set.headers[key] = value;
+        }
+      });
+      
+      // Adicionar todos os cookies Set-Cookie como array
+      if (setCookieValues.length > 0) {
+        set.headers['set-cookie'] = setCookieValues;
+      }
+      
+      // Obter o corpo da resposta
+      const contentType = response.headers.get('content-type') || '';
+      let body;
+      
+      if (contentType.includes('application/json')) {
+        body = await response.json();
+      } else {
+        body = await response.text();
+      }
+      
+      return body;
+    } catch (error) {
+      console.error('Error in Better Auth handler:', error);
+      set.status = 500;
+      return { error: 'Internal server error', message: error instanceof Error ? error.message : String(error) };
+    }
+  })
   .macro({
     auth: {
       async resolve({ status, request: { headers } }) {
