@@ -10,10 +10,17 @@ import { env } from './env';
 import { sendEmail } from './services/email.service';
 
 // Configurar baseURL para produção (necessário para cookies funcionarem corretamente)
-const baseURL = process.env.BETTER_AUTH_URL || 
-                (process.env.NODE_ENV === 'production' 
-                  ? 'https://popjoy-api.claudiolins.eu' 
-                  : 'http://localhost:3333');
+// Usar função para evitar problemas com minificação do Bun
+function getBaseURL(): string {
+  if (process.env.BETTER_AUTH_URL) {
+    return process.env.BETTER_AUTH_URL;
+  }
+  if (process.env.NODE_ENV === 'production') {
+    return 'https://popjoy-api.claudiolins.eu';
+  }
+  return 'http://localhost:3333';
+}
+const baseURL = getBaseURL();
 
 console.log('🔐 Better Auth Config:', {
   baseURL,
