@@ -26,6 +26,39 @@ async function startServer() {
         ];
 
     const app = new Elysia()
+      .onRequest(function ({ request }) {
+        const origin = request.headers.get('origin') || 'N/A';
+        const method = request.method;
+        const url = request.url;
+        const path = url ? new URL(url).pathname : url;
+        const timestamp = new Date().toISOString();
+        
+        console.log(`[${timestamp}] 📥 ${method} ${path} | Origin: ${origin}`);
+      })
+      .onAfterHandle(function ({ request, set }) {
+        const origin = request.headers.get('origin') || 'N/A';
+        const method = request.method;
+        const url = request.url;
+        const path = url ? new URL(url).pathname : url;
+        const status = set.status || 200;
+        const timestamp = new Date().toISOString();
+        
+        const statusColor = status >= 500 ? '🔴' : status >= 400 ? '🟡' : status >= 300 ? '🔵' : '🟢';
+        console.log(`[${timestamp}] ${statusColor} ${method} ${path} ${status} | Origin: ${origin}`);
+      })
+      .onError(function ({ error, request }) {
+        const origin = request.headers.get('origin') || 'N/A';
+        const method = request.method;
+        const url = request.url;
+        const path = url ? new URL(url).pathname : url;
+        const timestamp = new Date().toISOString();
+        
+        console.error(`[${timestamp}] ❌ ERROR ${method} ${path} | Origin: ${origin}`);
+        console.error(`Error: ${error.message}`);
+        if (error.stack) {
+          console.error(error.stack);
+        }
+      })
       .use(cors({
         origin: allowedOrigins,
         credentials: true,
