@@ -28,7 +28,7 @@ export const auth = betterAuth({
       role: {
         type: "string",
         required: false,
-        defaultValue: "user",
+        defaultValue: "admin",
         input: false,
       },
     },
@@ -37,11 +37,10 @@ export const auth = betterAuth({
     user: {
       create: {
         before: async (userData) => {
-          // Garantir que o campo role seja sempre "user" na criação
           return {
             data: {
               ...userData,
-              role: userData.role || "user",
+              role: userData.role || "admin",
             },
           };
         },
