@@ -15,6 +15,15 @@ const baseURL = process.env.BETTER_AUTH_URL ||
                   ? 'https://popjoy-api.claudiolins.eu' 
                   : 'http://localhost:3333');
 
+console.log('🔐 Better Auth Config:', {
+  baseURL,
+  basePath: '/api/auth',
+  nodeEnv: process.env.NODE_ENV,
+  trustedOrigins: ["http://localhost:3000","https://admin.popjoypipocas.com"],
+  cookieSameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+  cookieSecure: process.env.NODE_ENV === 'production',
+});
+
 export const auth = betterAuth({
   basePath: '/api/auth',
   baseURL,
