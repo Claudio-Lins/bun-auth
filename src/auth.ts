@@ -104,10 +104,6 @@ export const auth = betterAuth({
       verify: ({password, hash}) => Bun.password.verify(password, hash),
     },
     sendResetPassword: async ({ user, url, token }, request) => {
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/89dfd59f-5051-44a9-a586-4f79967ee771',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'auth.ts:sendResetPassword',message:'URL recebida do Better Auth',data:{originalUrl:url,hasToken:!!token,tokenValue:token,nodeEnv:process.env.NODE_ENV,frontendUrl:env.FRONTEND_URL,requestHost:request?.headers?.get?.('host')},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-      // #endregion
-      
       // Determinar URL do frontend baseado no ambiente
       // Detectar ambiente pelo host da requisição (mais confiável que NODE_ENV)
       const requestHost = request?.headers?.get?.('host') || '';
@@ -151,10 +147,6 @@ export const auth = betterAuth({
       // Construir nova URL apontando para o frontend
       const resetUrl = `${frontendUrl}${callbackURL}${resetToken ? `?token=${resetToken}` : ''}`;
       
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/89dfd59f-5051-44a9-a586-4f79967ee771',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'auth.ts:sendResetPassword',message:'URL construída para frontend',data:{resetUrl,frontendUrl,callbackURL,resetToken},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-      // #endregion
-      
       const html = resetPasswordTemplate(resetUrl);
       await sendEmail({
         to: user.email,
@@ -165,8 +157,10 @@ export const auth = betterAuth({
   },
   session: {
     expiresIn: 60 * 60 * 24 * 30, // 30 days
+    // Desabilitar cookieCache em produção para garantir que cookies sejam sempre retornados
+    // Isso é necessário para cross-domain onde navegadores podem precisar de refresh periódico
     cookieCache: {
-      enabled: true,
+      enabled: !isProduction, // Desabilitar em produção
       maxAge: 60 * 5 // 5 minutes
     },
     cookieOptions: {
