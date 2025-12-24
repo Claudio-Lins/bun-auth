@@ -140,10 +140,12 @@ export const auth = betterAuth({
       maxAge: 60 * 5 // 5 minutes
     },
     cookieOptions: {
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production', // HTTPS only em produção
+      // Para cross-domain (frontend e API em domínios diferentes), precisa ser 'none'
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      secure: process.env.NODE_ENV === 'production', // HTTPS only em produção (obrigatório com sameSite: none)
       httpOnly: true,
       path: '/',
+      // Não definir domain para permitir cross-domain
     }
   }
 });
