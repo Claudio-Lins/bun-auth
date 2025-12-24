@@ -137,7 +137,13 @@ export const auth = betterAuth({
     expiresIn: 60 * 60 * 24 * 30, // 30 days
     cookieCache: {
       enabled: true,
-      maxAge: 60 * 5 // 30 days
+      maxAge: 60 * 5 // 5 minutes
+    },
+    cookieOptions: {
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production', // HTTPS only em produção
+      httpOnly: true,
+      path: '/',
     }
   }
 });
