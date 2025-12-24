@@ -9,9 +9,19 @@ import { resetPasswordTemplate } from './emails/reset-password.template';
 import { env } from './env';
 import { sendEmail } from './services/email.service';
 
+// Configurar origens confiáveis para Better Auth
+const trustedOrigins = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(',').map(origin => origin.trim())
+  : [
+      "http://localhost:3000",
+      "https://admin.popjoypipocas.com",
+      "http://localhost:3333",
+      "https://popjoy-api.claudiolins.eu"
+    ];
+
 export const auth = betterAuth({
   basePath: '/api/auth',
-  trustedOrigins: ["http://localhost:3000","https://admin.popjoypipocas.com","http://localhost:3333", "https://popjoy-api.claudiolins.eu"],
+  trustedOrigins,
   plugins: [
     openAPI(),
     adminPlugin({

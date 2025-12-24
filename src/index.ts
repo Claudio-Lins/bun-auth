@@ -16,9 +16,18 @@ async function startServer() {
       DATABASE_URL: process.env.DATABASE_URL ? "***configured***" : "missing",
     });
 
+    // Configurar origens permitidas para CORS
+    const allowedOrigins = process.env.CORS_ORIGIN
+      ? process.env.CORS_ORIGIN.split(',').map(origin => origin.trim())
+      : [
+          "http://localhost:3000",
+          "https://admin.popjoypipocas.com",
+          "https://popjoy-api.claudiolins.eu"
+        ];
+
     const app = new Elysia()
       .use(cors({
-        origin: ["http://localhost:3000","https://admin.popjoypipocas.com", "https://popjoy-api.claudiolins.eu"],
+        origin: allowedOrigins,
         credentials: true,
       }))
       .use(openapi({
